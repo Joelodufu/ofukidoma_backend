@@ -9,7 +9,7 @@ const RECONNECT_INTERVAL = 5000; // Refresh connection every 5 seconds (adjust a
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(DATABASE_URI, {
+    await mongoose.connect(DATABASE, {
       useNewUrlParser: true,
     });
     console.log('⚡️:: Connected to MongoDB!');
