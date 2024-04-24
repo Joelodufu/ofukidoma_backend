@@ -44,6 +44,38 @@ exports.getAll = catchAsync(async (req, res, next) => {
     return next(new AppError("An error occured, please try again", 500));
   }
 })
+/**
+ * @author Joel Odufu EKowoicho <joel.odufu@gmail.com>
+ * @description Get all members Controller
+ * @route `/api/member/getmembers`
+ * @access Private
+ * @type GET
+ */
+exports.getAll = catchAsync(async (req, res, next) => {
+  try {
+    let query = {};
+    if (req.query.role) {
+      query.role = req.query.role.toUpperCase(); // Convert role to uppercase for consistency
+    }
+
+    const data = await Member.find(query);
+
+    // Check if the member exists
+    if (!data) {
+      return next(new AppError("Members not found", 404));
+    }
+
+    // Return data of list of all members
+    res.status(200).json({
+      success: true,
+      len: data.length,
+      data
+    });
+  } catch (error) {
+    return next(new AppError("An error occurred, please try again", 500));
+  }
+});
+
 
 /**
  * @author Joel Odufu EKowoicho <joel.odufu@gmail.com>
@@ -55,8 +87,9 @@ exports.getAll = catchAsync(async (req, res, next) => {
 exports.getMember = catchAsync(async (req, res, next) => {
   try {
     // Get the member by id
-    const data = await Member.findById(req.params.id).populate("_user")
+    const data = await Member.findById(req.params.id)
 
+    console.log(data);
     // Check if the member exists
     if (!data) {
       return next(new AppError('Member not found', 404));
@@ -82,7 +115,7 @@ exports.getMember = catchAsync(async (req, res, next) => {
  */
 exports.postMember = catchAsync(async (req, res, next) => {
   try {
-    const { fullName,image, email, role, gender, phone } = req.body;
+    const { fullName, image, email, role, gender, phone } = req.body;
 
     // Create a new member Object
     const member = new Member({
@@ -101,7 +134,7 @@ exports.postMember = catchAsync(async (req, res, next) => {
     // Save the member object to the database
     await member.save()
 
-    // const causeLink = `http://localhost:30000/cause/${cause._id}`;
+    // const memberLink = `http://localhost:30000/member/${member._id}`;
 
     res.status(200).json({
       success: true,
@@ -128,7 +161,7 @@ exports.editMember = catchAsync(async (req, res, next) => {
     // Find the user by ID
     const member = await Member.findByIdAndUpdate(id, updates, { new: true });
 
-    // Check if the cause exists
+    // Check if the member exists
     if (!member) {
       return next(new AppError('Member not found', 404));
     }
@@ -165,7 +198,7 @@ exports.deleteMember = catchAsync(async (req, res, next) => {
       success: true,
       message: "Member deleted successfully",
       data: {
-        cause: null
+        member: null
       }
     })
   } catch (error) {
